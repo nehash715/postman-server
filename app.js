@@ -20,33 +20,23 @@ app.listen(port,()=>console.log(`Listening on port ${port}`))
 
 let axios=require("axios");
 
-let json
-
-app.post("/set",function(req,res){
-    let body=req.body;
-    json=body
-    //console.log(body)
-    //res.send(body)
-})
 
 
-app.get("/getData" ,function(req,res){
- 
-   let token=req.header("authorization") || "dummyvalue"
 
-    axios.get(json.url,{headers:{authorization:token}})
+app.post("/post",function(req,res){
+    let payload=req.body
+    console.log(payload)
+    let token=req.header("authorization") || "dummyvalue"
+if(payload.req=='GET'){
+    axios.get(payload.url,{headers:{authorization:token}})
     .then(response=>{
-       console.log(response.data)
-      console.log( typeof response.data==='number')
       if(typeof response.data ==='number' ){
         res.send(""+response.data)
       }
       else{
         res.send(response.data)
       }
-
-
-    })
+})
   
     .catch(error=>{
         if(error.response){
@@ -58,12 +48,11 @@ app.get("/getData" ,function(req,res){
             res.status(404).send(error)
         }
     })
-})
-app.post("/postData" ,function(req,res){
-    let token=req.header("authorization") || "dummyvalue"
-    let body=req.body;
-    console.log(body)
-    axios.post(json.url,body,{headers:{authorization:token}})
+}
+
+else if(payload.req=="POST")
+{
+    axios.post(payload.url,payload.body,{headers:{authorization:token}})
     .then(function(response){
         console.log(response.data)
         res.send(response.data)
@@ -79,16 +68,11 @@ app.post("/postData" ,function(req,res){
         }
     
     })
-})
+}
 
-
-
-
-app.put("/putData",function(req,res){
-    let token=req.header("authorization") || "dummyvalue"
- 
-    let body=req.body;
-    axios.put(json.url,body,{headers:{authorization:token}})
+else if(payload.req=="PUT")
+{
+    axios.put(payload.url,payload.body,{headers:{authorization:token}})
     .then(function(response){
         console.log(response.data)
         res.send(response.data)
@@ -104,13 +88,9 @@ app.put("/putData",function(req,res){
         }
     
     })
-})
-
-
-app.delete("/deleteData",function(req,res){
-    let token=req.header("authorization") || "dummyvalue"
-    
-    axios.delete(json.url,{headers:{authorization:token}})
+}
+else{
+    axios.delete(payload.url,{headers:{authorization:token}})
     .then(function(response){
         console.log(response.data)
         res.send("deleted")
@@ -126,4 +106,7 @@ app.delete("/deleteData",function(req,res){
         }
     
     })
+}
+
+
 })
